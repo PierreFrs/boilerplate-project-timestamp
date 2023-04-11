@@ -30,19 +30,20 @@ let resObject = {};
 app.get("/api/:date", (req, res) => {
   // Capturing the date input
   let date = req.params.date;
-  // If its a timestamp
+  // If its a Date string
   if (/\d{5,}/.test(date)) {
     date = parseInt(date);
     resObject["unix"] = date;
     resObject["utc"] = new Date(date).toUTCString();
-  // Error Handler
-  } else if (!resObject["unix"] || !resObject["utc"]) {
-    res.json({ error: "Invalid Date" });
-  // If it is a string
+  // If it is a timestamp
   } else {
     resObject["unix"] = new Date(date).getTime();
     resObject["utc"] = new Date(date).toUTCString();
-  } 
+  }
+  // Error Handler
+  if (!resObject["unix"] || !resObject["utc"]) {
+    res.json({ error: "Invalid Date" });
+  }
   // Rendering the date input as a string
   res.json(resObject);
 });
@@ -53,7 +54,6 @@ app.get("/api/", (req, res) => {
   resObject["utc"] = new Date().toUTCString();
   res.json(resObject);
 });
-
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT || 3000, function () {

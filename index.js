@@ -24,35 +24,56 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
-// Blank object to be used in the response
-let resObject = {};
-// Get request
-app.get("/api/:date", (req, res) => {
-  // Capturing the date input
-  let date = req.params.date;
-  // If its a Date string
-  if (/\d{5,}/.test(date)) {
-    date = parseInt(date);
-    resObject["unix"] = date;
-    resObject["utc"] = new Date(date).toUTCString();
-  // If it is a timestamp
-  } else {
-    resObject["unix"] = new Date(date).getTime();
-    resObject["utc"] = new Date(date).toUTCString();
-  }
-  // Error Handler
-  if (!resObject["unix"] || !resObject["utc"]) {
-    res.json({ error: "Invalid Date" });
-  }
-  // Rendering the date input as a string
-  res.json(resObject);
-});
+// // Blank object to be used in the response
+// let resObject = {};
+// // Get request
+// app.get("/api/:date", (req, res) => {
+//   // Capturing the date input
+//   let date = req.params.date;
+//   // If its a Date string
+//   if (/\d{5,}/.test(date)) {
+//     date = parseInt(date);
+//     resObject["unix"] = date;
+//     resObject["utc"] = new Date(date).toUTCString();
+//   // If it is a timestamp
+//   } else {
+//     resObject["unix"] = new Date(date).getTime();
+//     resObject["utc"] = new Date(date).toUTCString();
+//   }
+//   // Error Handler
+//   if (!resObject["unix"] || !resObject["utc"]) {
+//     res.json({ error: "Invalid Date" });
+//   }
+//   // Rendering the date input as a string
+//   res.json(resObject);
+// });
 
 // Handling if there is no date on the date input
-app.get("/api/", (req, res) => {
-  resObject["unix"] = new Date().getTime();
-  resObject["utc"] = new Date().toUTCString();
-  res.json(resObject);
+app.get("/api", (req, res) => {
+  res.json({
+    unix: new Date().getTime(),
+    utc: new Date().toUTCString()
+  });
+});
+
+app.get("/api/:timestamp", (req, res) => {
+  const timestamp = req.params.timestamp;
+
+  if (!isNaN(Number(timestamp)) && timestamp.length === 13) {
+    return res.json({
+      unix: parseInt(timestamp),
+      utc: new Date(Number(timestamp)).toUTCString()
+    });
+  }
+
+  if (new Date(timestamp).toUTCString() !== "Invalid Date") {
+    return res.json({
+      unix: new Date(timestamp).getTime(),
+      utc: new Date(timestamp).toUTCString()
+    });
+  }
+
+  res.json({ error: "Invalid Date" });
 });
 
 // listen for requests :)

@@ -24,6 +24,7 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+// Handles the case of no date 
 app.get("/api", (req, res) => {
   res.json({
     unix: new Date().getTime(),
@@ -31,23 +32,25 @@ app.get("/api", (req, res) => {
   });
 });
 
+// Main get 
 app.get("/api/:timestamp", (req, res) => {
   const timestamp = req.params.timestamp;
 
+  // Verifies unix format
   if (!isNaN(Number(timestamp)) && timestamp.length === 13) {
     return res.json({
       unix: parseInt(timestamp),
       utc: new Date(Number(timestamp)).toUTCString()
     });
   }
-
+  // Verifies utc format
   if (new Date(timestamp).toUTCString() !== "Invalid Date") {
     return res.json({
       unix: new Date(timestamp).getTime(),
       utc: new Date(timestamp).toUTCString()
     });
   }
-
+  // Error handler
   res.json({ error: "Invalid Date" });
 });
 
